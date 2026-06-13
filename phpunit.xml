@@ -1,0 +1,15 @@
+﻿<?xml version="1.0"?>
+<phpunit
+    bootstrap="tests/bootstrap.php"
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+>
+    <testsuites>
+        <testsuite name="WPLedger">
+            <file>tests/test-ledger.php</file>
+            <file>tests/test-statements.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>

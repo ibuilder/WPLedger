@@ -1,0 +1,1030 @@
+# Copyright (C) 2024 WPLedger Accounting
+# This file is distributed under the same license as the WPLedger Accounting plugin.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: WPLedger Accounting 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/your-org/wpledger/issues\n"
+"POT-Creation-Date: 2026-06-10T00:00:00+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"X-Generator: WP-CLI 2.x\n"
+"X-Domain: wpledger\n"
+
+#. Plugin Name of the plugin
+msgid "WPLedger Accounting"
+msgstr ""
+
+#. Plugin URI of the plugin
+msgid "https://github.com/your-org/wpledger"
+msgstr ""
+
+#. Description of the plugin
+msgid "Double-entry accounting for WordPress: chart of accounts, journal entries, Balance Sheet, Income Statement, Cash Flow Statement, PDF export, and a REST API for invoicing and project-management integrations."
+msgstr ""
+
+#. Author of the plugin
+msgid "Your Name"
+msgstr ""
+
+#: includes/class-activator.php
+msgid "Company created and chart of accounts seeded."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "WPLedger"
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "Companies"
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "Chart of Accounts"
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "New Journal Entry"
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "Statements"
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "REST API"
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "Company name is required."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "Company created and chart of accounts seeded."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "Could not create company."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "Invalid entry date."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "Journal entry posted successfully."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "Company not found."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "Unknown report type."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "You do not have permission to access WPLedger."
+msgstr ""
+
+#: includes/admin/views/accounts.php
+msgid "Chart of Accounts"
+msgstr ""
+
+#: includes/admin/views/accounts.php
+msgid "— Select Company —"
+msgstr ""
+
+#: includes/admin/views/accounts.php
+msgid "Code"
+msgstr ""
+
+#: includes/admin/views/accounts.php
+msgid "Name"
+msgstr ""
+
+#: includes/admin/views/accounts.php
+msgid "Type"
+msgstr ""
+
+#: includes/admin/views/accounts.php
+msgid "Subtype"
+msgstr ""
+
+#: includes/admin/views/accounts.php
+msgid "Cash"
+msgstr ""
+
+#: includes/admin/views/accounts.php
+msgid "Active"
+msgstr ""
+
+#: includes/admin/views/accounts.php
+msgid "No accounts found for this company."
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "WPLedger REST API"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "WPLedger uses WordPress Application Passwords for external API authentication — no custom keys needed."
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "How to authenticate external tools"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+#. translators: %s: link to user profile
+msgid "Go to %s and create an Application Password for the tool you want to connect."
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Users → Your Profile → Application Passwords"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "The tool authenticates with HTTP Basic auth: username and the Application Password (spaces are ignored)."
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "The WordPress user must have the manage_wpledger capability (Administrators have it by default)."
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Base URL"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Example: post an invoice"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Available endpoints"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Method"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Endpoint"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Description"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "List all companies"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Create a company (seeds chart of accounts)"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Get a single company"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Update a company"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "List journal entries (optional ?start= &amp;end=)"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Post a manual journal entry"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Get one entry including its lines"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Balance Sheet JSON (?company_id= &amp;as_of=)"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Income Statement JSON (?company_id= &amp;start= &amp;end=)"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Cash Flow Statement JSON (?company_id= &amp;start= &amp;end=)"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Post a customer invoice"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Post a customer payment"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Post a project cost from a PM tool"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Post a vendor bill"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Report query parameters"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "(required integer) Company to report on."
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Snapshot date for Balance Sheet (YYYY-MM-DD). Default: today."
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "Period dates for Income Statement and Cash Flow (YYYY-MM-DD)."
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "PDF downloads"
+msgstr ""
+
+#: includes/admin/views/api-info.php
+msgid "PDF export is available in the admin Statements screen. Binary output cannot be served safely through the WordPress REST API."
+msgstr ""
+
+#: includes/admin/views/companies.php
+msgid "WPLedger — Companies"
+msgstr ""
+
+#: includes/admin/views/companies.php
+msgid "ID"
+msgstr ""
+
+#: includes/admin/views/companies.php
+msgid "Currency"
+msgstr ""
+
+#: includes/admin/views/companies.php
+msgid "FY Start Month"
+msgstr ""
+
+#: includes/admin/views/companies.php
+msgid "Actions"
+msgstr ""
+
+#: includes/admin/views/companies.php
+msgid "No companies yet."
+msgstr ""
+
+#: includes/admin/views/companies.php
+msgid "Add Company"
+msgstr ""
+
+#: includes/admin/views/companies.php
+msgid "Company Name"
+msgstr ""
+
+#: includes/admin/views/companies.php
+msgid "Legal Name"
+msgstr ""
+
+#: includes/admin/views/companies.php
+msgid "Base Currency"
+msgstr ""
+
+#: includes/admin/views/companies.php
+msgid "Fiscal Year Start Month"
+msgstr ""
+
+#: includes/admin/views/companies.php
+msgid "Create Company"
+msgstr ""
+
+#: includes/admin/views/journal.php
+msgid "New Journal Entry"
+msgstr ""
+
+#: includes/admin/views/journal.php
+msgid "Entry Date"
+msgstr ""
+
+#: includes/admin/views/journal.php
+msgid "Memo"
+msgstr ""
+
+#: includes/admin/views/journal.php
+msgid "Lines"
+msgstr ""
+
+#: includes/admin/views/journal.php
+msgid "Account"
+msgstr ""
+
+#: includes/admin/views/journal.php
+msgid "Debit"
+msgstr ""
+
+#: includes/admin/views/journal.php
+msgid "Credit"
+msgstr ""
+
+#: includes/admin/views/journal.php
+msgid "— Account —"
+msgstr ""
+
+#: includes/admin/views/journal.php
+msgid "Post Entry"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "Financial Statements"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "— Company —"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "Balance Sheet"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "Income Statement"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "Cash Flow"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "As of:"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "From:"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "To:"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "View"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "NOT BALANCED"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "DOES NOT RECONCILE"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "ASSETS"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "Current Assets"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "Total Current Assets"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "Non-Current Assets"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "TOTAL ASSETS"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "LIABILITIES"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "Total Liabilities"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "EQUITY"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "Current Year Earnings"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "Total Equity"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "TOTAL LIABILITIES & EQUITY"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "REVENUE"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "Gross Profit"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "OPERATING EXPENSES"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "Operating Income"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "NET INCOME"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "OPERATING ACTIVITIES"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "Net Cash from Operating"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "INVESTING ACTIVITIES"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "Net Cash from Investing"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "FINANCING ACTIVITIES"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "Net Cash from Financing"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "NET CHANGE IN CASH"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "Beginning Cash"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "Ending Cash"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "to"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "⬇ Download This Statement (PDF)"
+msgstr ""
+
+#: includes/admin/views/statements.php
+msgid "⬇ Download Full Package (PDF)"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Balance Sheet"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "As of"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "ASSETS"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Current Assets"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Total Current Assets"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Non-Current Assets"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Total Non-Current Assets"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "TOTAL ASSETS"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "LIABILITIES"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Current Liabilities"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Total Current Liabilities"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Non-Current Liabilities"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Total Liabilities"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "EQUITY"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Current Year Earnings"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Total Equity"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "TOTAL LIABILITIES & EQUITY"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Income Statement"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "REVENUE"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Total Revenue"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "COST OF GOODS SOLD"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Gross Profit"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "OPERATING EXPENSES"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Operating Income"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "OTHER INCOME / EXPENSE"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "NET INCOME"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Cash Flow Statement (Indirect Method)"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "OPERATING ACTIVITIES"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Net Cash from Operating"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "INVESTING ACTIVITIES"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Net Cash from Investing"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "FINANCING ACTIVITIES"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Net Cash from Financing"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "NET CHANGE IN CASH"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Beginning Cash Balance"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "Ending Cash Balance"
+msgstr ""
+
+#: includes/pdf/class-pdf-renderer.php
+msgid "to"
+msgstr ""
+
+#: includes/rest/class-rest-auth.php
+msgid "You do not have permission to access WPLedger data."
+msgstr ""
+
+#: includes/rest/class-rest-companies.php
+msgid "Could not create company. Please try again."
+msgstr ""
+
+#: includes/rest/class-rest-companies.php
+msgid "Company not found."
+msgstr ""
+
+#: includes/rest/class-rest-companies.php
+msgid "Resource primary key."
+msgstr ""
+
+#: includes/rest/class-rest-companies.php
+msgid "Display name of the company."
+msgstr ""
+
+#: includes/rest/class-rest-companies.php
+msgid "Legal / registered company name."
+msgstr ""
+
+#: includes/rest/class-rest-companies.php
+msgid "Employer Identification Number."
+msgstr ""
+
+#: includes/rest/class-rest-companies.php
+msgid "Company mailing address."
+msgstr ""
+
+#: includes/rest/class-rest-companies.php
+msgid "Month the fiscal year begins (1–12)."
+msgstr ""
+
+#: includes/rest/class-rest-companies.php
+msgid "ISO 4217 three-letter currency code (e.g. USD)."
+msgstr ""
+
+#: includes/rest/class-rest-journal.php
+msgid "Filter: entries on or after this date (YYYY-MM-DD)."
+msgstr ""
+
+#: includes/rest/class-rest-journal.php
+msgid "Filter: entries on or before this date (YYYY-MM-DD)."
+msgstr ""
+
+#: includes/rest/class-rest-journal.php
+msgid "Journal entry date (YYYY-MM-DD)."
+msgstr ""
+
+#: includes/rest/class-rest-journal.php
+msgid "Optional narrative for this entry."
+msgstr ""
+
+#: includes/rest/class-rest-journal.php
+msgid "Optional external reference number."
+msgstr ""
+
+#: includes/rest/class-rest-journal.php
+msgid "Journal lines — minimum 2, total debits must equal total credits."
+msgstr ""
+
+#: includes/rest/class-rest-journal.php
+msgid "Journal entry ID."
+msgstr ""
+
+#: includes/rest/class-rest-journal.php
+msgid "Journal entry not found."
+msgstr ""
+
+#: includes/rest/class-rest-journal.php
+msgid "A journal entry requires at least two lines."
+msgstr ""
+
+#. translators: %d: line index (1-based)
+#: includes/rest/class-rest-journal.php
+msgid "Line %d is missing a valid account_id."
+msgstr ""
+
+#. translators: %d: line index (1-based)
+#: includes/rest/class-rest-journal.php
+msgid "Line %d: debit and credit amounts must be non-negative."
+msgstr ""
+
+#. translators: %d: line index (1-based)
+#: includes/rest/class-rest-journal.php
+msgid "Line %d cannot have both a debit and a credit."
+msgstr ""
+
+#: includes/rest/class-rest-reports.php
+msgid "Snapshot date (YYYY-MM-DD). Defaults to today."
+msgstr ""
+
+#: includes/rest/class-rest-reports.php
+msgid "Period start date (YYYY-MM-DD)."
+msgstr ""
+
+#: includes/rest/class-rest-reports.php
+msgid "Period end date (YYYY-MM-DD)."
+msgstr ""
+
+#: includes/rest/class-rest-reports.php
+msgid "Company not found."
+msgstr ""
+
+#: includes/rest/class-rest-integrations.php
+msgid "Customer name or identifier (used in memo)."
+msgstr ""
+
+#: includes/rest/class-rest-integrations.php
+msgid "Invoice line items — at least one required."
+msgstr ""
+
+#: includes/rest/class-rest-integrations.php
+msgid "Tax amount: added to AR total, credited to Accrued Liabilities (2100)."
+msgstr ""
+
+#: includes/rest/class-rest-integrations.php
+msgid "Payment amount received."
+msgstr ""
+
+#: includes/rest/class-rest-integrations.php
+msgid "Account code for the cash account (default: 1000)."
+msgstr ""
+
+#: includes/rest/class-rest-integrations.php
+msgid "Cost amount."
+msgstr ""
+
+#: includes/rest/class-rest-integrations.php
+msgid "Expense account code (default: 5000 COGS)."
+msgstr ""
+
+#: includes/rest/class-rest-integrations.php
+msgid "External project identifier (included in line memo)."
+msgstr ""
+
+#: includes/rest/class-rest-integrations.php
+msgid "Human-readable project name (included in entry memo)."
+msgstr ""
+
+#: includes/rest/class-rest-integrations.php
+msgid "Bill amount."
+msgstr ""
+
+#: includes/rest/class-rest-integrations.php
+msgid "Expense account code (default: 6300 Office & Admin)."
+msgstr ""
+
+#: includes/rest/class-rest-integrations.php
+msgid "Vendor name (included in entry memo)."
+msgstr ""
+
+#: includes/rest/class-rest-integrations.php
+msgid "Transaction date (YYYY-MM-DD)."
+msgstr ""
+
+#: includes/rest/class-rest-integrations.php
+msgid "Idempotency key. Duplicate (source + external_id) pairs are rejected by the database."
+msgstr ""
+
+#. translators: %s: account code string
+#: includes/rest/class-rest-integrations.php
+msgid "Account %s not found or inactive for this company."
+msgstr ""
+
+#: includes/rest/trait-rest-helpers.php
+#. translators: %s: parameter name
+msgid "Invalid date for parameter \"%s\". Expected YYYY-MM-DD."
+msgstr ""
+
+#. translators: %s: parameter name
+#: includes/rest/trait-rest-helpers.php
+msgid "Parameter \"%s\" must be a positive number."
+msgstr ""
+
+#: includes/rest/trait-rest-helpers.php
+msgid "Company ID."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "Journal Ledger"
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "All fields are required and must be valid."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "Could not create account. The account code may already exist for this company."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "Account created."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "Account deactivated."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "Account activated."
+msgstr ""
+
+#: includes/admin/views/accounts.php
+msgid "Actions"
+msgstr ""
+
+#: includes/admin/views/accounts.php
+msgid "Deactivate"
+msgstr ""
+
+#: includes/admin/views/accounts.php
+msgid "Activate"
+msgstr ""
+
+#: includes/admin/views/accounts.php
+msgid "Add Account"
+msgstr ""
+
+#: includes/admin/views/accounts.php
+msgid "Is Cash Account?"
+msgstr ""
+
+#: includes/admin/views/accounts.php
+msgid "Include in cash flow reconciliation"
+msgstr ""
+
+#: includes/admin/views/ledger.php
+msgid "Journal Ledger"
+msgstr ""
+
+#: includes/admin/views/ledger.php
+#. translators: 1: current page, 2: total pages, 3: total entries
+msgid "Page %1$d of %2$d — %3$d entries total"
+msgstr ""
+
+#: includes/admin/views/ledger.php
+msgid "No journal entries posted yet."
+msgstr ""
+
+#: includes/class-plugin.php
+msgid "Debits"
+msgstr ""
+
+#: includes/class-plugin.php
+msgid "Credits"
+msgstr ""
+
+#: includes/class-plugin.php
+msgid "Balanced"
+msgstr ""
+
+#: includes/class-plugin.php
+msgid "Unbalanced"
+msgstr ""
+
+#: wpledger.php
+msgid "Composer dependencies are missing. Run \"composer install\" inside the plugin directory."
+msgstr ""
+
+#: includes/integrations/class-woocommerce-sync.php
+msgid "WooCommerce is not active."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "WooCommerce settings saved."
+msgstr ""
+
+#. translators: 1: number of entries synced, 2: number skipped
+#: includes/admin/class-admin-menu.php
+msgid "Historical sync complete: %1$d entries posted, %2$d skipped (already synced)."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "Invalid account data."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "Account updated."
+msgstr ""
+
+#: includes/admin/class-admin-menu.php
+msgid "WooCommerce"
+msgstr ""
+
+#: includes/admin/views/accounts.php
+msgid "Edit Account"
+msgstr ""
+
+#: includes/admin/views/accounts.php
+msgid "Edit"
+msgstr ""
+
+#: includes/admin/views/accounts.php
+msgid "Save Changes"
+msgstr ""
+
+#: includes/admin/views/accounts.php
+msgid "Cancel"
+msgstr ""
+
+#: includes/admin/views/woocommerce.php
+msgid "WooCommerce Integration"
+msgstr ""
+
+#: includes/admin/views/woocommerce.php
+msgid "WooCommerce is not active. Activate WooCommerce to enable this integration."
+msgstr ""
+
+#: includes/admin/views/woocommerce.php
+msgid "Account Mapping"
+msgstr ""
+
+#: includes/admin/views/woocommerce.php
+msgid "Map WooCommerce order components to account codes in your chart of accounts. Entries are posted automatically when an order reaches Processing or Completed status."
+msgstr ""
+
+#: includes/admin/views/woocommerce.php
+msgid "Company"
+msgstr ""
+
+#: includes/admin/views/woocommerce.php
+msgid "Journal entries are posted to this company."
+msgstr ""
+
+#: includes/admin/views/woocommerce.php
+msgid "Cash / Bank Account Code"
+msgstr ""
+
+#: includes/admin/views/woocommerce.php
+msgid "Debited when an order is paid (DR). Credited on refunds."
+msgstr ""
+
+#: includes/admin/views/woocommerce.php
+msgid "Sales Revenue Account Code"
+msgstr ""
+
+#: includes/admin/views/woocommerce.php
+msgid "Credited with the net product amount (total minus tax and shipping)."
+msgstr ""
+
+#: includes/admin/views/woocommerce.php
+msgid "Sales Tax Payable Account Code"
+msgstr ""
+
+#: includes/admin/views/woocommerce.php
+msgid "Credited with the tax portion of each order (if any)."
+msgstr ""
+
+#: includes/admin/views/woocommerce.php
+msgid "Shipping Revenue Account Code"
+msgstr ""
+
+#: includes/admin/views/woocommerce.php
+msgid "Credited with the shipping amount (if any)."
+msgstr ""
+
+#: includes/admin/views/woocommerce.php
+msgid "Save Settings"
+msgstr ""
+
+#: includes/admin/views/woocommerce.php
+msgid "Historical Sync"
+msgstr ""
+
+#: includes/admin/views/woocommerce.php
+msgid "Post journal entries for all existing Processing and Completed orders that have not yet been synced. Entries that already exist are skipped automatically (idempotent)."
+msgstr ""
+
+#: includes/admin/views/woocommerce.php
+msgid "Run Historical Sync"
+msgstr ""
+
+#: includes/admin/views/woocommerce.php
+msgid "Save a company selection above before running a historical sync."
+msgstr ""
