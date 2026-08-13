@@ -13,7 +13,7 @@
 		EXPENSE:   [ 'COGS', 'OPERATING_EXPENSE', 'OTHER_EXPENSE' ]
 	};
 
-	window.lcUpdateSubtypes = function ( type ) {
+	window.wplUpdateSubtypes = function ( type ) {
 		var sel = document.getElementById( 'wpl-acc-subtype' );
 		if ( ! sel ) { return; }
 

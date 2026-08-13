@@ -56,7 +56,10 @@ class WoocommerceSync {
 	public function sync_order( int $order_id, \WC_Order $order ): void {
 		$msg = $this->sync_order_internal( $order_id, $order );
 		if ( 'synced' !== $msg && 'skipped' !== $msg ) {
-			error_log( '[WPLedger] WC sync: ' . $msg );
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( '[WPLedger] WC sync: ' . $msg );
+			}
 		}
 	}
 
@@ -188,7 +191,10 @@ class WoocommerceSync {
 		$revenue_id = $this->resolve_account( $company_id, $revenue_code );
 
 		if ( ! $cash_id || ! $revenue_id ) {
-			error_log( '[WPLedger] WC refund sync skipped refund ' . $refund_id . ': account not found.' );
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log( '[WPLedger] WC refund sync skipped refund ' . $refund_id . ': account not found.' );
+			}
 			return;
 		}
 
@@ -217,7 +223,10 @@ class WoocommerceSync {
 			);
 		} catch ( LedgerException $e ) {
 			if ( false === strpos( $e->getMessage(), 'Duplicate' ) ) {
+				if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				error_log( '[WPLedger] WC refund sync failed for refund ' . $refund_id . ': ' . $e->getMessage() );
+			}
 			}
 		}
 	}

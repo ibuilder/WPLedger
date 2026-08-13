@@ -47,8 +47,8 @@ class WcInvoice {
 		add_filter( 'woocommerce_my_account_my_orders_actions', [ $this, 'add_my_account_action' ], 10, 2 );
 
 		// Handle the PDF download request (both admin and frontend).
-		add_action( 'admin_post_lc_download_invoice',    [ $this, 'handle_download' ] );
-		add_action( 'admin_post_nopriv_lc_download_invoice', [ $this, 'handle_download_nopriv' ] );
+		add_action( 'admin_post_wpl_download_invoice',    [ $this, 'handle_download' ] );
+		add_action( 'admin_post_nopriv_wpl_download_invoice', [ $this, 'handle_download_nopriv' ] );
 
 		// Auto-email on order completion if enabled.
 		add_action( 'woocommerce_order_status_completed', [ $this, 'maybe_email_invoice' ], 20 );
@@ -85,7 +85,7 @@ class WcInvoice {
 			: $post_or_order->get_id();
 
 		$url = wp_nonce_url(
-			admin_url( 'admin-post.php?action=lc_download_invoice&order_id=' . absint( $order_id ) ),
+			admin_url( 'admin-post.php?action=wpl_download_invoice&order_id=' . absint( $order_id ) ),
 			'wpl_invoice_' . $order_id
 		);
 		echo '<p><a href="' . esc_url( $url ) . '" class="button">'
@@ -241,11 +241,11 @@ class WcInvoice {
 	 * @return string Complete HTML document.
 	 */
 	private function build_html( \WC_Order $order, ?object $company ): string {
-		$company_name    = $company ? esc_html( $company->name ) : esc_html( get_bloginfo( 'name' ) );
+		$company_name    = $company ? $company->name : get_bloginfo( 'name' );
 		$company_address = $company ? nl2br( esc_html( $company->address ?? '' ) ) : '';
-		$order_number    = esc_html( $order->get_order_number() );
-		$order_date      = esc_html( wc_format_datetime( $order->get_date_created() ) );
-		$order_status    = esc_html( wc_get_order_status_name( $order->get_status() ) );
+		$order_number    = $order->get_order_number();
+		$order_date      = wc_format_datetime( $order->get_date_created() );
+		$order_status    = wc_get_order_status_name( $order->get_status() );
 
 		$billing = $order->get_formatted_billing_address();
 
@@ -282,7 +282,7 @@ class WcInvoice {
 <div class="wrap">
   <div class="header">
 	<div class="header-left">
-	  <h1 class="company"><?php echo $company_name; ?></h1>
+	  <h1 class="company"><?php echo esc_html( $company_name ); ?></h1>
 	  <?php if ( $company_address ) : ?>
 	  <div><?php echo $company_address; ?></div>
 	  <?php endif; ?>
@@ -295,17 +295,17 @@ class WcInvoice {
   <table class="meta-table">
 	<tr>
 	  <td><?php esc_html_e( 'Invoice #', 'wpledger' ); ?></td>
-	  <td><?php echo $order_number; ?></td>
+	  <td><?php echo esc_html( $order_number ); ?></td>
 	  <td style="width:40px"></td>
 	  <td style="font-weight:bold"><?php esc_html_e( 'Bill To', 'wpledger' ); ?></td>
 	  <td><?php echo wp_kses_post( $billing ); ?></td>
 	</tr>
 	<tr>
 	  <td><?php esc_html_e( 'Date', 'wpledger' ); ?></td>
-	  <td><?php echo $order_date; ?></td>
+	  <td><?php echo esc_html( $order_date ); ?></td>
 	  <td></td>
 	  <td><?php esc_html_e( 'Status', 'wpledger' ); ?></td>
-	  <td><?php echo $order_status; ?></td>
+	  <td><?php echo esc_html( $order_status ); ?></td>
 	</tr>
 	<?php if ( $order->get_billing_email() ) : ?>
 	<tr>
@@ -384,7 +384,7 @@ class WcInvoice {
 	printf(
 		/* translators: %s: company name */
 		esc_html__( 'Thank you for your business — %s', 'wpledger' ),
-		$company_name
+		esc_html( $company_name )
 	);
 	?>
   </div>
@@ -426,6 +426,6 @@ class WcInvoice {
 	 * @return string e.g. invoice-1042.pdf
 	 */
 	private function filename( \WC_Order $order ): string {
-		return 'invoice-' . $order->get_order_number() . '.pdf';
+		return sanitize_file_name( 'invoice-' . $order->get_order_number() . '.pdf' );
 	}
 }

@@ -51,11 +51,6 @@ class Plugin {
 	}
 
 	/**
-	 * Load the plugin text domain for i18n.
-	 *
-	 * @return void
-	 */
-	/**
 	 * Initialise WooCommerce integration after all plugins have loaded.
 	 *
 	 * @return void
@@ -65,6 +60,11 @@ class Plugin {
 		( new WcInvoice() )->register();
 	}
 
+	/**
+	 * Load the plugin text domain for i18n.
+	 *
+	 * @return void
+	 */
 	public function load_textdomain(): void {
 		load_plugin_textdomain(
 			'wpledger',

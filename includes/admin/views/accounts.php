@@ -102,7 +102,7 @@ $type_subtypes = [
 				<tr>
 					<th><label for="wpl-acc-type"><?php esc_html_e( 'Type', 'wpledger' ); ?></label></th>
 					<td>
-						<select id="wpl-acc-type" name="type" required onchange="lcUpdateSubtypes(this.value)">
+						<select id="wpl-acc-type" name="type" required onchange="wplUpdateSubtypes(this.value)">
 							<option value=""><?php esc_html_e( '— Select —', 'wpledger' ); ?></option>
 							<?php foreach ( array_keys( $type_subtypes ) as $t ) : ?>
 								<option value="<?php echo esc_attr( $t ); ?>"><?php echo esc_html( $t ); ?></option>

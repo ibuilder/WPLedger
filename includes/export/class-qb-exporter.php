@@ -127,7 +127,7 @@ class QbExporter {
 
 		foreach ( $entries as $entry ) {
 			$date   = gmdate( 'm/d/Y', strtotime( $entry->entry_date ) );
-			$jno    = $entry->reference ?: 'LCE-' . $entry->id;
+			$jno    = $entry->reference ?: 'WPL-' . $entry->id;
 			$memo   = $entry->memo ?? '';
 
 			foreach ( $entry->lines as $line ) {

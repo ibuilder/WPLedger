@@ -34,15 +34,15 @@ class AdminMenu {
 	 */
 	public function register(): void {
 		add_action( 'admin_menu',    [ $this, 'add_menu' ] );
-		add_action( 'admin_post_lc_create_company',  [ $this, 'handle_create_company' ] );
-		add_action( 'admin_post_lc_create_account', [ $this, 'handle_create_account' ] );
-		add_action( 'admin_post_lc_edit_account',   [ $this, 'handle_edit_account' ] );
-		add_action( 'admin_post_lc_toggle_account', [ $this, 'handle_toggle_account' ] );
-		add_action( 'admin_post_lc_post_entry',      [ $this, 'handle_post_entry' ] );
-		add_action( 'admin_post_lc_download_report',      [ $this, 'handle_download_report' ] );
-		add_action( 'admin_post_lc_wc_settings',          [ $this, 'handle_wc_settings' ] );
-		add_action( 'admin_post_lc_wc_historical_sync',   [ $this, 'handle_wc_historical_sync' ] );
-		add_action( 'admin_post_lc_export_qb',            [ $this, 'handle_export_qb' ] );
+		add_action( 'admin_post_wpl_create_company',       [ $this, 'handle_create_company' ] );
+		add_action( 'admin_post_wpl_create_account',      [ $this, 'handle_create_account' ] );
+		add_action( 'admin_post_wpl_edit_account',        [ $this, 'handle_edit_account' ] );
+		add_action( 'admin_post_wpl_toggle_account',      [ $this, 'handle_toggle_account' ] );
+		add_action( 'admin_post_wpl_post_entry',          [ $this, 'handle_post_entry' ] );
+		add_action( 'admin_post_wpl_download_report',     [ $this, 'handle_download_report' ] );
+		add_action( 'admin_post_wpl_wc_settings',         [ $this, 'handle_wc_settings' ] );
+		add_action( 'admin_post_wpl_wc_historical_sync',  [ $this, 'handle_wc_historical_sync' ] );
+		add_action( 'admin_post_wpl_export_qb',           [ $this, 'handle_export_qb' ] );
 		add_action( 'admin_enqueue_scripts',         [ $this, 'enqueue_assets' ] );
 	}
 
@@ -80,7 +80,7 @@ class AdminMenu {
 	 * @return void
 	 */
 	public function enqueue_assets(): void {
-		if ( ! $this->is_lc_screen() ) {
+		if ( ! $this->is_wpl_screen() ) {
 			return;
 		}
 
@@ -105,7 +105,7 @@ class AdminMenu {
 	 *
 	 * @return bool
 	 */
-	private function is_lc_screen(): bool {
+	private function is_wpl_screen(): bool {
 		$screen = get_current_screen();
 		if ( ! $screen ) {
 			return false;
@@ -265,7 +265,7 @@ class AdminMenu {
 	public function page_woocommerce(): void {
 		$this->require_cap();
 		global $wpdb;
-		$companies = $wpdb->get_results( "SELECT id, name FROM {$wpdb->prefix}lc_companies ORDER BY name" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		$companies = $wpdb->get_results( 'SELECT id, name FROM ' . Schema::t( 'companies' ) . ' ORDER BY name' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		$sync      = new WoocommerceSync();
 		$settings  = $sync->settings();
 		$wc_active = $sync->wc_active();
@@ -285,13 +285,14 @@ class AdminMenu {
 		$this->require_cap();
 
 		global $wpdb;
-		$companies = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-			"SELECT id, name FROM {$wpdb->prefix}lc_companies ORDER BY name"
-		) ?: [];
+		$companies = $wpdb->get_results( 'SELECT id, name FROM ' . Schema::t( 'companies' ) . ' ORDER BY name' ) ?: []; // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only filter params.
 		$company_id = absint( $_GET['company_id'] ?? ( $companies[0]->id ?? 0 ) );
-		$end        = sanitize_text_field( wp_unslash( $_GET['end']   ?? gmdate( 'Y-m-d' ) ) );
-		$start      = sanitize_text_field( wp_unslash( $_GET['start'] ?? gmdate( 'Y-01-01' ) ) );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$end   = $this->sanitize_date_param( wp_unslash( $_GET['end']   ?? '' ) ) ?: gmdate( 'Y-m-d' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$start = $this->sanitize_date_param( wp_unslash( $_GET['start'] ?? '' ) ) ?: gmdate( 'Y-01-01' );
 
 		// Build the company selector snippet used in both forms in the view.
 		ob_start();
@@ -382,7 +383,7 @@ class AdminMenu {
 
 		if ( ! $date ) {
 			$this->set_flash( __( 'Invalid entry date.', 'wpledger' ), 'error' );
-			wp_safe_redirect( admin_url( 'admin.php?page=lc-journal&company_id=' . $cid ) );
+			wp_safe_redirect( admin_url( 'admin.php?page=wpl-journal&company_id=' . $cid ) );
 			exit;
 		}
 
@@ -415,7 +416,7 @@ class AdminMenu {
 			$this->set_flash( $e->getMessage(), 'error' );
 		}
 
-		wp_safe_redirect( admin_url( 'admin.php?page=lc-journal&company_id=' . $cid ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=wpl-journal&company_id=' . $cid ) );
 		exit;
 	}
 
@@ -442,7 +443,7 @@ class AdminMenu {
 
 		if ( ! $cid || ! $code || ! $name || ! in_array( $type, $valid_types, true ) || ! in_array( $subtype, $valid_subtypes, true ) ) {
 			$this->set_flash( __( 'All fields are required and must be valid.', 'wpledger' ), 'error' );
-			wp_safe_redirect( admin_url( 'admin.php?page=lc-accounts&company_id=' . $cid ) );
+			wp_safe_redirect( admin_url( 'admin.php?page=wpl-accounts&company_id=' . $cid ) );
 			exit;
 		}
 
@@ -466,7 +467,7 @@ class AdminMenu {
 			$this->set_flash( __( 'Account created.', 'wpledger' ) );
 		}
 
-		wp_safe_redirect( admin_url( 'admin.php?page=lc-accounts&company_id=' . $cid ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=wpl-accounts&company_id=' . $cid ) );
 		exit;
 	}
 
@@ -485,7 +486,7 @@ class AdminMenu {
 		$company_id = absint( $_POST['company_id'] ?? 0 );
 
 		if ( ! $account_id ) {
-			wp_safe_redirect( admin_url( 'admin.php?page=lc-accounts&company_id=' . $company_id ) );
+			wp_safe_redirect( admin_url( 'admin.php?page=wpl-accounts&company_id=' . $company_id ) );
 			exit;
 		}
 
@@ -498,7 +499,7 @@ class AdminMenu {
 			: __( 'Account activated.', 'wpledger' )
 		);
 
-		wp_safe_redirect( admin_url( 'admin.php?page=lc-accounts&company_id=' . $company_id ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=wpl-accounts&company_id=' . $company_id ) );
 		exit;
 	}
 
@@ -521,7 +522,7 @@ class AdminMenu {
 
 		if ( ! $account_id || ! $company_id || '' === $code || '' === $name ) {
 			$this->set_flash( __( 'Invalid account data.', 'wpledger' ), 'error' );
-			wp_safe_redirect( admin_url( 'admin.php?page=lc-accounts&company_id=' . $company_id ) );
+			wp_safe_redirect( admin_url( 'admin.php?page=wpl-accounts&company_id=' . $company_id ) );
 			exit;
 		}
 
@@ -539,7 +540,7 @@ class AdminMenu {
 		);
 
 		$this->set_flash( __( 'Account updated.', 'wpledger' ) );
-		wp_safe_redirect( admin_url( 'admin.php?page=lc-accounts&company_id=' . $company_id ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=wpl-accounts&company_id=' . $company_id ) );
 		exit;
 	}
 
@@ -722,7 +723,7 @@ class AdminMenu {
 			[ 'type' => 'success', 'message' => __( 'WooCommerce settings saved.', 'wpledger' ) ],
 			30
 		);
-		wp_safe_redirect( admin_url( 'admin.php?page=lc-woocommerce' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=wpl-woocommerce' ) );
 		exit;
 	}
 
@@ -752,7 +753,7 @@ class AdminMenu {
 		];
 
 		set_transient( 'wpl_wc_flash_' . get_current_user_id(), $flash, 30 );
-		wp_safe_redirect( admin_url( 'admin.php?page=lc-woocommerce' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=wpl-woocommerce' ) );
 		exit;
 	}
 
@@ -767,8 +768,8 @@ class AdminMenu {
 
 		$company_id = absint( $_POST['company_id'] ?? 0 );
 		$format     = sanitize_key( $_POST['format'] ?? 'csv' );
-		$start      = sanitize_text_field( wp_unslash( $_POST['start'] ?? '' ) );
-		$end        = sanitize_text_field( wp_unslash( $_POST['end']   ?? '' ) );
+		$start      = $this->sanitize_date_param( wp_unslash( $_POST['start'] ?? '' ) ) ?: '';
+		$end        = $this->sanitize_date_param( wp_unslash( $_POST['end']   ?? '' ) ) ?: '';
 
 		if ( ! $company_id || ! $start || ! $end ) {
 			wp_die( esc_html__( 'Company, start date, and end date are all required.', 'wpledger' ) );

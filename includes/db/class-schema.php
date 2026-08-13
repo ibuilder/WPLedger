@@ -22,9 +22,9 @@ class Schema {
 	public const TABLES = [ 'journal_lines', 'journal_entries', 'accounts', 'companies' ];
 
 	/**
-	 * Return the full prefixed table name for a given lc_ table.
+	 * Return the full prefixed table name for a given wpl_ table.
 	 *
-	 * @param string $name Table suffix after lc_ (e.g. 'companies').
+	 * @param string $name Table suffix after wpl_ (e.g. 'companies').
 	 * @return string Full table name including WP prefix.
 	 */
 	public static function t( string $name ): string {
