@@ -90,4 +90,41 @@
 		}
 	} );
 
+	/* ------------------------------------------------------------------
+	 * Recurring entries: Add Line / Remove Line buttons.
+	 * ------------------------------------------------------------------ */
+	var addLineBtn = document.getElementById( 'wpl-add-rec-line' );
+	if ( addLineBtn ) {
+		addLineBtn.addEventListener( 'click', function () {
+			var tbody = document.getElementById( 'wpl-rec-lines-body' );
+			if ( ! tbody ) { return; }
+			var rows  = tbody.querySelectorAll( 'tr' );
+			if ( ! rows.length ) { return; }
+			var clone = rows[ 0 ].cloneNode( true );
+
+			// Clear values in the cloned row.
+			clone.querySelectorAll( 'input' ).forEach( function ( inp ) {
+				inp.value = inp.type === 'number' ? '0.00' : '';
+			} );
+			clone.querySelectorAll( 'select' ).forEach( function ( sel ) {
+				sel.selectedIndex = 0;
+			} );
+
+			tbody.appendChild( clone );
+		} );
+
+		// Delegated handler for × remove buttons.
+		var linesBody = document.getElementById( 'wpl-rec-lines-body' );
+		if ( linesBody ) {
+			linesBody.addEventListener( 'click', function ( e ) {
+				var btn = e.target.closest( '.wpl-remove-line' );
+				if ( ! btn ) { return; }
+				var rows = linesBody.querySelectorAll( 'tr' );
+				if ( rows.length > 2 ) {
+					btn.closest( 'tr' ).remove();
+				}
+			} );
+		}
+	}
+
 }() );

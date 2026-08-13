@@ -43,6 +43,7 @@ require_once $wpledger_autoload;
 
 register_activation_hook( __FILE__, [ 'WPLedger\\Activator', 'activate' ] );
 register_deactivation_hook( __FILE__, [ 'WPLedger\\Deactivator', 'deactivate' ] );
+register_deactivation_hook( __FILE__, [ 'WPLedger\\Services\\Recurring', 'unschedule' ] );
 
 add_action( 'plugins_loaded', function () {
 	( new WPLedger\Plugin() )->run();

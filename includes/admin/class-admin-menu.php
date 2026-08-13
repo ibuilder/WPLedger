@@ -21,6 +21,7 @@ use WPLedger\Services\Statements;
 use WPLedger\Pdf\PdfRenderer;
 use WPLedger\Integrations\WoocommerceSync;
 use WPLedger\Export\QbExporter;
+use WPLedger\Services\Recurring;
 
 /**
  * Registers the WPLedger top-level admin menu and all sub-menu pages.
@@ -43,6 +44,9 @@ class AdminMenu {
 		add_action( 'admin_post_wpl_wc_settings',         [ $this, 'handle_wc_settings' ] );
 		add_action( 'admin_post_wpl_wc_historical_sync',  [ $this, 'handle_wc_historical_sync' ] );
 		add_action( 'admin_post_wpl_export_qb',           [ $this, 'handle_export_qb' ] );
+		add_action( 'admin_post_wpl_create_recurring',    [ $this, 'handle_create_recurring' ] );
+		add_action( 'admin_post_wpl_toggle_recurring',    [ $this, 'handle_toggle_recurring' ] );
+		add_action( 'admin_post_wpl_delete_recurring',    [ $this, 'handle_delete_recurring' ] );
 		add_action( 'admin_enqueue_scripts',         [ $this, 'enqueue_assets' ] );
 	}
 
@@ -69,6 +73,7 @@ class AdminMenu {
 		add_submenu_page( 'wpledger', __( 'Journal Ledger', 'wpledger' ),   __( 'Journal Ledger', 'wpledger' ),   'manage_wpledger', 'wpl-ledger',    [ $this, 'page_ledger' ] );
 		add_submenu_page( 'wpledger', __( 'REST API', 'wpledger' ),          __( 'REST API', 'wpledger' ),          'manage_wpledger', 'wpl-api',        [ $this, 'page_api_info' ] );
 		add_submenu_page( 'wpledger', __( 'Export', 'wpledger' ),           __( 'Export', 'wpledger' ),           'manage_wpledger', 'wpl-export',     [ $this, 'page_export' ] );
+		add_submenu_page( 'wpledger', __( 'Recurring', 'wpledger' ),        __( 'Recurring', 'wpledger' ),        'manage_wpledger', 'wpl-recurring',   [ $this, 'page_recurring' ] );
 		if ( class_exists( 'WooCommerce' ) ) {
 			add_submenu_page( 'wpledger', __( 'WooCommerce', 'wpledger' ), __( 'WooCommerce', 'wpledger' ), 'manage_wpledger', 'wpl-woocommerce', [ $this, 'page_woocommerce' ] );
 		}
@@ -190,8 +195,15 @@ class AdminMenu {
 
 		$companies = $wpdb->get_results( 'SELECT id, name, fiscal_year_start_month FROM ' . Schema::t( 'companies' ) . ' ORDER BY name' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		$data      = null;
+		$accounts  = [];
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$account_id = absint( $_GET['account_id'] ?? 0 );
 
 		if ( $company_id ) {
+			$accounts = $wpdb->get_results( // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+				$wpdb->prepare( 'SELECT id, code, name FROM ' . Schema::t( 'accounts' ) . ' WHERE company_id = %d AND is_active = 1 ORDER BY code', $company_id )
+			) ?: [];
+
 			$company_row = $wpdb->get_row( // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 				$wpdb->prepare( 'SELECT * FROM ' . Schema::t( 'companies' ) . ' WHERE id = %d', $company_id ),
 				ARRAY_A
@@ -205,6 +217,10 @@ class AdminMenu {
 					$data = Statements::income_statement( $company_id, $start, $end );
 				} elseif ( 'cash_flow' === $statement ) {
 					$data = Statements::cash_flow_statement( $company_id, $start, $end );
+				} elseif ( 'trial_balance' === $statement ) {
+					$data = Statements::trial_balance( $company_id, $as_of );
+				} elseif ( 'general_ledger' === $statement ) {
+					$data = Statements::general_ledger( $company_id, $start, $end, $account_id );
 				}
 			} catch ( \Throwable $e ) {
 				$data = [ 'error' => $e->getMessage() ];
@@ -554,11 +570,12 @@ class AdminMenu {
 		$this->require_cap();
 
 		global $wpdb;
-		$cid    = absint( $_POST['company_id'] ?? 0 );
-		$report = sanitize_key( $_POST['report'] ?? 'balance_sheet' );
-		$as_of  = $this->sanitize_date_param( wp_unslash( $_POST['as_of']  ?? '' ) ) ?: gmdate( 'Y-m-d' );
-		$start  = $this->sanitize_date_param( wp_unslash( $_POST['start']  ?? '' ) ) ?: gmdate( 'Y-01-01' );
-		$end    = $this->sanitize_date_param( wp_unslash( $_POST['end']    ?? '' ) ) ?: gmdate( 'Y-m-d' );
+		$cid        = absint( $_POST['company_id'] ?? 0 );
+		$report     = sanitize_key( $_POST['report'] ?? 'balance_sheet' );
+		$as_of      = $this->sanitize_date_param( wp_unslash( $_POST['as_of']  ?? '' ) ) ?: gmdate( 'Y-m-d' );
+		$start      = $this->sanitize_date_param( wp_unslash( $_POST['start']  ?? '' ) ) ?: gmdate( 'Y-01-01' );
+		$end        = $this->sanitize_date_param( wp_unslash( $_POST['end']    ?? '' ) ) ?: gmdate( 'Y-m-d' );
+		$account_id = absint( $_POST['account_id'] ?? 0 );
 
 		$company = $wpdb->get_row( // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 			$wpdb->prepare( 'SELECT * FROM ' . Schema::t( 'companies' ) . ' WHERE id = %d', $cid ),
@@ -592,6 +609,16 @@ class AdminMenu {
 				$cf  = Statements::cash_flow_statement( $cid, $start, $end );
 				$pdf = PdfRenderer::financial_package( $company, $bs, $is, $cf );
 				$fn  = "financial_package_{$as_of}.pdf";
+				break;
+			case 'trial_balance':
+				$data = Statements::trial_balance( $cid, $as_of );
+				$pdf  = PdfRenderer::render_html( PdfRenderer::trial_balance_html( $company, $data ) );
+				$fn   = "trial_balance_{$as_of}.pdf";
+				break;
+			case 'general_ledger':
+				$data = Statements::general_ledger( $cid, $start, $end, $account_id );
+				$pdf  = PdfRenderer::render_html( PdfRenderer::general_ledger_html( $company, $data ) );
+				$fn   = "general_ledger_{$start}_{$end}.pdf";
 				break;
 			default:
 				wp_die( esc_html__( 'Unknown report type.', 'wpledger' ) );
@@ -754,6 +781,120 @@ class AdminMenu {
 
 		set_transient( 'wpl_wc_flash_' . get_current_user_id(), $flash, 30 );
 		wp_safe_redirect( admin_url( 'admin.php?page=wpl-woocommerce' ) );
+		exit;
+	}
+
+	/**
+	 * Recurring journal entries management page.
+	 *
+	 * @return void
+	 */
+	public function page_recurring(): void {
+		$this->require_cap();
+		global $wpdb;
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only.
+		$company_id = absint( $_GET['company_id'] ?? 0 );
+		$companies  = $wpdb->get_results( 'SELECT id, name FROM ' . Schema::t( 'companies' ) . ' ORDER BY name' ) ?: []; // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$entries    = $company_id ? Recurring::get_all( $company_id ) : [];
+		$accounts   = $company_id
+			? $wpdb->get_results( $wpdb->prepare( 'SELECT id, code, name FROM ' . Schema::t( 'accounts' ) . ' WHERE company_id = %d AND is_active = 1 ORDER BY code', $company_id ) ) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			: [];
+		$flash = $this->get_flash();
+
+		include WPLEDGER_DIR . 'includes/admin/views/recurring.php';
+	}
+
+	/**
+	 * Handle creation of a new recurring entry template.
+	 *
+	 * @return void
+	 */
+	public function handle_create_recurring(): void {
+		check_admin_referer( 'wpl_create_recurring' );
+		$this->require_cap();
+
+		$company_id = absint( $_POST['company_id'] ?? 0 );
+		$name       = sanitize_text_field( wp_unslash( $_POST['name']       ?? '' ) );
+		$frequency  = sanitize_key( $_POST['frequency']  ?? 'monthly' );
+		$start_date = $this->sanitize_date_param( wp_unslash( $_POST['start_date'] ?? '' ) ) ?: '';
+		$memo       = sanitize_text_field( wp_unslash( $_POST['memo'] ?? '' ) );
+
+		$raw_accts   = array_map( 'absint', (array) ( $_POST['account_id'] ?? [] ) );
+		$raw_debits  = array_map( fn( $v ) => $this->sanitize_money( wp_unslash( $v ) ), (array) ( $_POST['debit']     ?? [] ) );
+		$raw_credits = array_map( fn( $v ) => $this->sanitize_money( wp_unslash( $v ) ), (array) ( $_POST['credit']    ?? [] ) );
+		$raw_memos   = array_map( 'sanitize_text_field', array_map( 'wp_unslash', (array) ( $_POST['line_memo'] ?? [] ) ) );
+
+		$lines = [];
+		foreach ( $raw_accts as $i => $acct_id ) {
+			if ( ! $acct_id ) {
+				continue;
+			}
+			$lines[] = [
+				'account_id' => $acct_id,
+				'debit'      => $raw_debits[ $i ] ?? '0.00',
+				'credit'     => $raw_credits[ $i ] ?? '0.00',
+				'line_memo'  => $raw_memos[ $i ] ?? null,
+			];
+		}
+
+		if ( ! $company_id || ! $name || ! $start_date || count( $lines ) < 2 ) {
+			$this->set_flash( __( 'All fields and at least two journal lines are required.', 'wpledger' ), 'error' );
+			wp_safe_redirect( admin_url( 'admin.php?page=wpl-recurring&company_id=' . $company_id ) );
+			exit;
+		}
+
+		$id = Recurring::create( $company_id, $name, $frequency, $start_date, $lines, $memo );
+
+		if ( $id ) {
+			$this->set_flash( __( 'Recurring entry created.', 'wpledger' ) );
+		} else {
+			$this->set_flash( __( 'Could not save recurring entry. Check that the frequency is valid.', 'wpledger' ), 'error' );
+		}
+
+		wp_safe_redirect( admin_url( 'admin.php?page=wpl-recurring&company_id=' . $company_id ) );
+		exit;
+	}
+
+	/**
+	 * Toggle a recurring entry active/paused.
+	 *
+	 * @return void
+	 */
+	public function handle_toggle_recurring(): void {
+		check_admin_referer( 'wpl_toggle_recurring' );
+		$this->require_cap();
+
+		$id         = absint( $_POST['id'] ?? 0 );
+		$company_id = absint( $_POST['company_id'] ?? 0 );
+
+		if ( $id ) {
+			Recurring::toggle( $id );
+			$this->set_flash( __( 'Recurring entry updated.', 'wpledger' ) );
+		}
+
+		wp_safe_redirect( admin_url( 'admin.php?page=wpl-recurring&company_id=' . $company_id ) );
+		exit;
+	}
+
+	/**
+	 * Delete a recurring entry permanently.
+	 *
+	 * @return void
+	 */
+	public function handle_delete_recurring(): void {
+		check_admin_referer( 'wpl_delete_recurring' );
+		$this->require_cap();
+
+		$id         = absint( $_POST['id'] ?? 0 );
+		$company_id = absint( $_POST['company_id'] ?? 0 );
+
+		if ( $id ) {
+			Recurring::delete( $id );
+			$this->set_flash( __( 'Recurring entry deleted.', 'wpledger' ) );
+		}
+
+		wp_safe_redirect( admin_url( 'admin.php?page=wpl-recurring&company_id=' . $company_id ) );
 		exit;
 	}
 

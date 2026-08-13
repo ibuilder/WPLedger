@@ -19,7 +19,7 @@ namespace WPLedger\Db;
 class Schema {
 
 	/** Plugin tables — order matters for FK-safe drops (children first). */
-	public const TABLES = [ 'journal_lines', 'journal_entries', 'accounts', 'companies' ];
+	public const TABLES = [ 'journal_lines', 'journal_entries', 'recurring_entries', 'accounts', 'companies' ];
 
 	/**
 	 * Return the full prefixed table name for a given wpl_ table.
@@ -107,6 +107,23 @@ class Schema {
             PRIMARY KEY  (id),
             KEY idx_entry (entry_id),
             KEY idx_account (account_id)
+        ) {$charset};";
+
+		$recurring = self::t( 'recurring_entries' );
+
+		$sql[] = "CREATE TABLE {$recurring} (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            company_id BIGINT UNSIGNED NOT NULL,
+            name VARCHAR(200) NOT NULL,
+            frequency VARCHAR(20) NOT NULL DEFAULT 'monthly',
+            next_run_date DATE NOT NULL,
+            lines_json TEXT NOT NULL,
+            memo VARCHAR(255) NULL,
+            is_active TINYINT(1) NOT NULL DEFAULT 1,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            KEY idx_active_date (is_active, next_run_date),
+            KEY idx_company (company_id)
         ) {$charset};";
 
 		foreach ( $sql as $statement ) {

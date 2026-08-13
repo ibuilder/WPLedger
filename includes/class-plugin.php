@@ -15,8 +15,10 @@ use WPLedger\Rest\RestJournal;
 use WPLedger\Rest\RestReports;
 use WPLedger\Rest\RestIntegrations;
 use WPLedger\Admin\AdminMenu;
+use WPLedger\Admin\DashboardWidget;
 use WPLedger\Integrations\WoocommerceSync;
 use WPLedger\Integrations\WcInvoice;
+use WPLedger\Services\Recurring;
 
 /**
  * Orchestrates hook registration for every plugin subsystem.
@@ -44,9 +46,13 @@ class Plugin {
 		// WooCommerce integration — registers hooks after plugins loaded.
 		add_action( 'plugins_loaded', [ $this, 'init_woocommerce' ] );
 
+		// Recurring journal entries — WP-Cron scheduling.
+		( new Recurring() )->register();
+
 		// Admin UI — only in admin context.
 		if ( is_admin() ) {
 			( new AdminMenu() )->register();
+			( new DashboardWidget() )->register();
 		}
 	}
 
