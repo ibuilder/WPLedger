@@ -131,10 +131,22 @@ $vendorStrip = @(
     'thecodingmachine\safe\generated\8.1\exec.php',
     'thecodingmachine\safe\generated\8.1\filesystem.php',
     'thecodingmachine\safe\generated\8.1\errorfunc.php',
+    'thecodingmachine\safe\generated\8.1\info.php',
     'thecodingmachine\safe\generated\8.2\exec.php',
     'thecodingmachine\safe\generated\8.2\filesystem.php',
     'thecodingmachine\safe\generated\8.2\errorfunc.php',
-    'thecodingmachine\safe\lib\special_cases.php'
+    'thecodingmachine\safe\generated\8.2\info.php',
+    'thecodingmachine\safe\generated\8.4\info.php',
+    'thecodingmachine\safe\generated\8.5\info.php',
+    'thecodingmachine\safe\generated\8.6\info.php',
+    'thecodingmachine\safe\lib\special_cases.php',
+    # Dompdf README files contain URL shorteners flagged by preflight.
+    'dompdf\dompdf\README.md',
+    'dompdf\dompdf\CHANGELOG.md',
+    'dompdf\php-font-lib\README.md',
+    'dompdf\php-svg-lib\README.md',
+    'masterminds\html5\README.md',
+    'sabberworm\php-css-parser\README.md'
 )
 
 function Remove-IfExists ( [string]$path ) {
