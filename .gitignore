@@ -1,0 +1,15 @@
+# Build artifacts
+wpledger-*.zip
+
+# Composer — keep vendor/ tracked except regenerated autoload files
+vendor/composer/autoload_classmap.php
+vendor/composer/autoload_static.php
+vendor/composer/installed.php
+vendor/composer/installed.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
