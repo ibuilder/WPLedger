@@ -1,4 +1,4 @@
-﻿# build.ps1 — Build a distributable zip for WordPress.org submission.
+# build.ps1 — Build a clean WordPress.org submission zip.
 #
 # Usage:
 #   .\build.ps1
@@ -27,7 +27,7 @@ if ( -not $Version ) {
 $slug    = 'wpledger'
 $zipName = "$slug-$Version.zip"
 $buildDir = Join-Path $PSScriptRoot "build\$slug"
-$zipPath = Join-Path $PSScriptRoot $zipName
+$zipPath  = Join-Path $PSScriptRoot $zipName
 
 Write-Host "Building $zipName ..." -ForegroundColor Cyan
 
@@ -50,7 +50,7 @@ try {
     Pop-Location
 }
 
-# ---- Files and directories to include in the zip ----
+# ---- Files and directories to include ----
 $include = @(
     'includes',
     'assets',
@@ -80,34 +80,82 @@ foreach ( $item in $include ) {
     }
 }
 
-# ---- Remove dev-only files from the vendor copy ----
-$vendorDest = Join-Path $buildDir 'vendor'
-$devPaths = @(
-    'bin',
-    'dompdf\dompdf\www'
+# ---- Strip items that must not ship in a WP.org zip ----
+# Hidden files / VCS / tooling
+$globalStrip = @(
+    '.git',
+    '.gitignore',
+    '.gitattributes',
+    '.gitkeep',
+    '.gitmodules',
+    '.github',
+    '.travis.yml',
+    '.editorconfig',
+    '.php-cs-fixer.php',
+    '.phpcs.xml',
+    'phpcs.xml',
+    'phpunit.xml',
+    'phpunit.xml.dist',
+    '.claude',
+    'node_modules',
+    'tests',
+    'build.ps1',
+    'composer.json',
+    'composer.lock',
+    'Makefile',
+    'Gruntfile.js',
+    'webpack.config.js',
+    'package.json',
+    'package-lock.json',
+    'yarn.lock',
+    '*.zip',
+    'bin'
 )
-foreach ( $rel in $devPaths ) {
-    $p = Join-Path $vendorDest $rel
-    if ( Test-Path $p ) {
-        Remove-Item $p -Recurse -Force
+
+# Vendor-specific paths that are dev/demo only
+$vendorStrip = @(
+    'dompdf\dompdf\www',
+    'dompdf\dompdf\tests',
+    'dompdf\dompdf\.github',
+    'dompdf\php-font-lib\tests',
+    'dompdf\php-svg-lib\tests',
+    'masterminds\html5\tests',
+    'masterminds\html5\benchmarks',
+    'masterminds\html5\bin',
+    'sabberworm\php-css-parser\tests',
+    'thecodingmachine\safe\tests',
+    'thecodingmachine\safe\generator',
+    # Strip thecodingmachine/safe generated wrappers for system/exec/error functions.
+    # Dompdf only uses the math, strings, and array safe-wrappers at runtime;
+    # the exec/filesystem/errorfunc stubs are never called and trigger WP.org checks.
+    'thecodingmachine\safe\generated\8.1\exec.php',
+    'thecodingmachine\safe\generated\8.1\filesystem.php',
+    'thecodingmachine\safe\generated\8.1\errorfunc.php',
+    'thecodingmachine\safe\generated\8.2\exec.php',
+    'thecodingmachine\safe\generated\8.2\filesystem.php',
+    'thecodingmachine\safe\generated\8.2\errorfunc.php',
+    'thecodingmachine\safe\lib\special_cases.php'
+)
+
+function Remove-IfExists ( [string]$path ) {
+    if ( Test-Path $path ) {
+        Remove-Item $path -Recurse -Force
+        Write-Host "  stripped: $($path.Replace($buildDir + '\', ''))" -ForegroundColor DarkGray
     }
 }
 
-# ---- Remove any test / dev artefacts that might have been copied ----
-$stripFromBuild = @(
-    'tests',
-    'phpcs.xml',
-    'phpunit.xml',
-    '.claude',
-    'build.ps1',
-    'composer.json',
-    'composer.lock'
-)
-foreach ( $rel in $stripFromBuild ) {
-    $p = Join-Path $buildDir $rel
-    if ( Test-Path $p ) {
-        Remove-Item $p -Recurse -Force
-    }
+Write-Host "Stripping dev/hidden files from build..."
+
+# Strip top-level items by name (recurse through entire build tree)
+foreach ( $pattern in $globalStrip ) {
+    Get-ChildItem -Path $buildDir -Filter $pattern -Recurse -Force -ErrorAction SilentlyContinue |
+        ForEach-Object { Remove-IfExists $_.FullName }
+}
+
+# Strip vendor-specific paths
+$vendorDest = Join-Path $buildDir 'vendor'
+foreach ( $rel in $vendorStrip ) {
+    Remove-IfExists ( Join-Path $vendorDest $rel )
 }
 
 # ---- Create zip ----

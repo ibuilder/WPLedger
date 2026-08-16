@@ -28,6 +28,7 @@ class PdfRenderer {
 	public static function render_html( string $html ): string {
 		$options = new Options();
 		$options->set( 'isRemoteEnabled', false ); // Never fetch remote resources.
+		$options->set( 'isPhpEnabled', false );     // Disable PHP-in-CSS execution; belt-and-suspenders.
 		$options->set( 'defaultFont', 'Helvetica' );
 
 		$dompdf = new Dompdf( $options );

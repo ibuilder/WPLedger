@@ -1,4 +1,4 @@
-﻿=== WPLedger Accounting ===
+=== WPLedger Accounting ===
 Contributors: wpledger
 Tags: accounting, bookkeeping, double-entry, financial statements, invoicing
 Requires at least: 6.0
@@ -8,7 +8,7 @@ Stable tag: 0.1.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Double-entry accounting for WordPress — chart of accounts, journal entries, Balance Sheet, Income Statement, Cash Flow Statement, PDF export, and a REST API.
+Double-entry accounting for WordPress: chart of accounts, journal entries, Balance Sheet, Income Statement, Cash Flow, PDF export, and a REST API.
 
 == Description ==
 
