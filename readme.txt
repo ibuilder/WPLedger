@@ -130,7 +130,8 @@ HTTP requests.
 
 = Will uninstalling the plugin delete my data? =
 
-Yes. `uninstall.php` drops all four `lc_` tables and the
+Yes. `uninstall.php` drops all plugin tables (`wpl_companies`, `wpl_accounts`,
+`wpl_journal_entries`, `wpl_journal_lines`, `wpl_recurring_entries`) and the
 `wpledger_db_version` option when you delete the plugin via the admin.
 Deactivating (without deleting) leaves data intact.
 
@@ -139,17 +140,6 @@ Deactivating (without deleting) leaves data intact.
 No. WPLedger makes no external HTTP requests. API keys authenticate inbound
 connections from your tools; the plugin itself never "phones home".
 
-== Screenshots ==
-
-1. Companies list and create form.
-2. Chart of Accounts with Add Account form and active/inactive toggle.
-3. Manual Journal Entry form with live running debit/credit totals.
-4. Journal Ledger — paginated view of all posted entries with lines.
-5. Balance Sheet viewer with balanced flag and PDF download button.
-6. Income Statement viewer.
-7. Cash Flow Statement with reconciliation status flag.
-8. REST API info page — Application Passwords setup guide and endpoint reference.
-9. WooCommerce integration — account mapping settings and historical sync.
 
 == Changelog ==
 

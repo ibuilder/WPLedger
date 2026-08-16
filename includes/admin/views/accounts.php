@@ -14,7 +14,7 @@ $type_subtypes = [
 	'EXPENSE'   => [ 'COGS', 'OPERATING_EXPENSE', 'OTHER_EXPENSE' ],
 ];
 ?>
-<div class="wrap lc-wrap">
+<div class="wrap wpl-wrap">
 	<h1><?php esc_html_e( 'Chart of Accounts', 'wpledger' ); ?></h1>
 
 	<?php if ( $flash ) : ?>

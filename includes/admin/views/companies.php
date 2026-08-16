@@ -6,7 +6,7 @@
  */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 ?>
-<div class="wrap lc-wrap">
+<div class="wrap wpl-wrap">
 	<h1><?php esc_html_e( 'WPLedger — Companies', 'wpledger' ); ?></h1>
 
 	<?php if ( $flash ) : ?>
@@ -35,9 +35,9 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 						<td><?php echo esc_html( $c->base_currency ); ?></td>
 						<td><?php echo absint( $c->fiscal_year_start_month ); ?></td>
 						<td>
-							<a href="<?php echo esc_url( admin_url( 'admin.php?page=lc-accounts&company_id=' . absint( $c->id ) ) ); ?>"><?php esc_html_e( 'Chart of Accounts', 'wpledger' ); ?></a>
+							<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpl-accounts&company_id=' . absint( $c->id ) ) ); ?>"><?php esc_html_e( 'Chart of Accounts', 'wpledger' ); ?></a>
 							&nbsp;|&nbsp;
-							<a href="<?php echo esc_url( admin_url( 'admin.php?page=lc-statements&company_id=' . absint( $c->id ) ) ); ?>"><?php esc_html_e( 'Statements', 'wpledger' ); ?></a>
+							<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpl-statements&company_id=' . absint( $c->id ) ) ); ?>"><?php esc_html_e( 'Statements', 'wpledger' ); ?></a>
 						</td>
 					</tr>
 				<?php endforeach; ?>

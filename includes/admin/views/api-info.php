@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 $profile_url = admin_url( 'profile.php#application-passwords-section' );
 ?>
-<div class="wrap lc-wrap">
+<div class="wrap wpl-wrap">
 	<h1><?php esc_html_e( 'WPLedger REST API', 'wpledger' ); ?></h1>
 
 	<div class="notice notice-info">

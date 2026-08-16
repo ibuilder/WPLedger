@@ -6,7 +6,7 @@
  */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 ?>
-<div class="wrap lc-wrap">
+<div class="wrap wpl-wrap">
 	<h1><?php esc_html_e( 'New Journal Entry', 'wpledger' ); ?></h1>
 
 	<?php if ( $flash ) : ?>

@@ -208,6 +208,93 @@ class PdfRenderer {
 	}
 
 	/**
+	 * Build trial balance HTML for PDF rendering.
+	 *
+	 * @param array $company Company info array.
+	 * @param array $tb      Trial balance data from Statements::trial_balance().
+	 * @return string Complete HTML document.
+	 */
+	public static function trial_balance_html( array $company, array $tb ): string {
+		$fmt = fn( $v ) => number_format( (float) $v, 2 );
+		$head = self::header_html( $company, 'Trial Balance', 'As of ' . esc_html( $tb['as_of'] ) );
+
+		$rows = '';
+		foreach ( $tb['rows'] as $r ) {
+			$d = bccomp( $r['debit'], '0', 2 ) > 0 ? esc_html( $fmt( $r['debit'] ) ) : '';
+			$c = bccomp( $r['credit'], '0', 2 ) > 0 ? esc_html( $fmt( $r['credit'] ) ) : '';
+			$rows .= '<tr><td>' . esc_html( $r['code'] ) . '</td><td>' . esc_html( $r['name'] )
+				. '</td><td class="amt">' . $d . '</td><td class="amt">' . $c . '</td></tr>';
+		}
+
+		$balanced_note = $tb['balanced'] ? '' : ' <span style="color:red">&#9888; DOES NOT BALANCE</span>';
+
+		return $head
+			. '<table>'
+			. '<thead><tr><th>Code</th><th>Account</th><th class="amt">Debit</th><th class="amt">Credit</th></tr></thead>'
+			. '<tbody>' . $rows . '</tbody>'
+			. '<tfoot><tr class="grand"><td colspan="2">TOTALS' . $balanced_note . '</td>'
+			. '<td class="amt">' . esc_html( $fmt( $tb['total_debits'] ) ) . '</td>'
+			. '<td class="amt">' . esc_html( $fmt( $tb['total_credits'] ) ) . '</td>'
+			. '</tr></tfoot>'
+			. '</table></body></html>';
+	}
+
+	/**
+	 * Build general ledger HTML for PDF rendering.
+	 *
+	 * @param array $company Company info array.
+	 * @param array $gl      General ledger data from Statements::general_ledger().
+	 * @return string Complete HTML document.
+	 */
+	public static function general_ledger_html( array $company, array $gl ): string {
+		$fmt    = fn( $v ) => number_format( (float) $v, 2 );
+		$period = esc_html( $gl['period']['start'] ) . ' to ' . esc_html( $gl['period']['end'] );
+		$head   = self::header_html( $company, 'General Ledger', $period );
+
+		$body = '';
+		foreach ( $gl['ledger'] as $account ) {
+			$body .= '<h2 style="font-size:13px;margin-top:18px">'
+				. esc_html( $account['code'] . ' — ' . $account['name'] ) . '</h2>'
+				. '<table>'
+				. '<thead><tr><th>Date</th><th>Entry</th><th>Memo</th><th class="amt">Debit</th><th class="amt">Credit</th><th class="amt">Balance</th></tr></thead>'
+				. '<tbody>'
+				. '<tr style="color:#666;font-style:italic"><td colspan="5">Opening Balance</td><td class="amt">' . esc_html( $fmt( $account['opening'] ) ) . '</td></tr>';
+
+			foreach ( $account['rows'] as $r ) {
+				$memo = esc_html( $r['memo'] . ( $r['reference'] ? ' [' . $r['reference'] . ']' : '' ) );
+				$d    = $r['debit']  ? esc_html( $fmt( $r['debit'] ) )  : '';
+				$c    = $r['credit'] ? esc_html( $fmt( $r['credit'] ) ) : '';
+				$body .= '<tr><td>' . esc_html( $r['date'] ) . '</td><td>#' . absint( $r['entry_id'] ) . '</td>'
+					. '<td>' . $memo . '</td>'
+					. '<td class="amt">' . $d . '</td><td class="amt">' . $c . '</td>'
+					. '<td class="amt">' . esc_html( $fmt( $r['balance'] ) ) . '</td></tr>';
+			}
+
+			$body .= '<tr class="total"><td colspan="5">Closing Balance</td><td class="amt">' . esc_html( $fmt( $account['closing'] ) ) . '</td></tr>'
+				. '</tbody></table>';
+		}
+
+		return $head . $body . '</body></html>';
+	}
+
+	/**
+	 * Build the shared header HTML block (company name, report title, period).
+	 *
+	 * @param array  $company Company info array.
+	 * @param string $title   Report title.
+	 * @param string $period  Period or "as of" string.
+	 * @return string Opening HTML through the header section.
+	 */
+	private static function header_html( array $company, string $title, string $period ): string {
+		$name = esc_html( $company['name'] ?? '' );
+		return '<!DOCTYPE html><html><head><meta charset="UTF-8">'
+			. self::base_css()
+			. '</head><body>'
+			. '<h1>' . $name . '</h1>'
+			. '<div class="sub">' . esc_html( $title ) . ' | ' . $period . '</div>';
+	}
+
+	/**
 	 * Build a combined financial package PDF (all three statements, page-broken).
 	 *
 	 * @param array $company Company info array.

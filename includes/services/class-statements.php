@@ -278,6 +278,171 @@ class Statements {
 	}
 
 	/**
+	 * TRIAL BALANCE: net balance of every account as of a date.
+	 *
+	 * Each account's net balance appears in the Debit or Credit column
+	 * depending on whether it carries a normal debit or credit balance.
+	 * Total debits must equal total credits.
+	 *
+	 * @param int    $company_id Company ID.
+	 * @param string $as_of      Snapshot date (ISO).
+	 * @return array Structured trial balance data with 'balanced' flag.
+	 */
+	public static function trial_balance( int $company_id, string $as_of ): array {
+		global $wpdb;
+		$at = Schema::t( 'accounts' );
+		$et = Schema::t( 'journal_entries' );
+		$lt = Schema::t( 'journal_lines' );
+
+		// Single query: raw debit and credit totals per account through $as_of.
+		$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->prepare(
+				"SELECT a.id, a.code, a.name, a.type,
+				        COALESCE(SUM(jl.debit), 0)  AS total_debit,
+				        COALESCE(SUM(jl.credit), 0) AS total_credit
+				   FROM {$at} a
+				   LEFT JOIN {$lt} jl  ON jl.account_id = a.id
+				   LEFT JOIN {$et} je  ON je.id = jl.entry_id
+				                      AND je.posted = 1
+				                      AND je.entry_date <= %s
+				  WHERE a.company_id = %d
+				  GROUP BY a.id
+				  HAVING total_debit > 0 OR total_credit > 0
+				  ORDER BY a.code",
+				$as_of,
+				$company_id
+			)
+		) ?: [];
+
+		$total_debits  = '0';
+		$total_credits = '0';
+		$formatted     = [];
+
+		foreach ( $rows as $r ) {
+			$d = number_format( (float) $r->total_debit,  2, '.', '' );
+			$c = number_format( (float) $r->total_credit, 2, '.', '' );
+
+			// Net balance in normal-balance direction.
+			$is_debit_normal = in_array( $r->type, [ 'ASSET', 'EXPENSE' ], true );
+			$net = $is_debit_normal ? bcsub( $d, $c, 2 ) : bcsub( $c, $d, 2 );
+
+			// Positive net → normal column; negative net → opposite column (contra).
+			if ( bccomp( $net, '0', 2 ) >= 0 ) {
+				$debit_col  = $is_debit_normal ? $net : '0.00';
+				$credit_col = $is_debit_normal ? '0.00' : $net;
+			} else {
+				$abs        = bcmul( $net, '-1', 2 );
+				$debit_col  = $is_debit_normal ? '0.00' : $abs;
+				$credit_col = $is_debit_normal ? $abs : '0.00';
+			}
+
+			$total_debits  = bcadd( $total_debits,  $debit_col,  2 );
+			$total_credits = bcadd( $total_credits, $credit_col, 2 );
+
+			$formatted[] = [
+				'code'   => $r->code,
+				'name'   => $r->name,
+				'type'   => $r->type,
+				'debit'  => $debit_col,
+				'credit' => $credit_col,
+			];
+		}
+
+		return [
+			'as_of'         => $as_of,
+			'rows'          => $formatted,
+			'total_debits'  => $total_debits,
+			'total_credits' => $total_credits,
+			'balanced'      => bccomp( $total_debits, $total_credits, 2 ) === 0,
+		];
+	}
+
+	/**
+	 * GENERAL LEDGER: per-account transaction history with running balance.
+	 *
+	 * @param int    $company_id Company ID.
+	 * @param string $start      Period start date (ISO).
+	 * @param string $end        Period end date (ISO).
+	 * @param int    $account_id Specific account to filter (0 = all accounts).
+	 * @return array Structured general ledger data.
+	 */
+	public static function general_ledger( int $company_id, string $start, string $end, int $account_id = 0 ): array {
+		global $wpdb;
+		$at = Schema::t( 'accounts' );
+		$et = Schema::t( 'journal_entries' );
+		$lt = Schema::t( 'journal_lines' );
+
+		if ( $account_id ) {
+			$accts = $wpdb->get_results( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$wpdb->prepare( "SELECT * FROM {$at} WHERE id = %d AND company_id = %d ORDER BY code", $account_id, $company_id )
+			) ?: [];
+		} else {
+			$accts = $wpdb->get_results( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$wpdb->prepare( "SELECT * FROM {$at} WHERE company_id = %d ORDER BY code", $company_id )
+			) ?: [];
+		}
+
+		$prior  = gmdate( 'Y-m-d', strtotime( $start . ' -1 day' ) );
+		$ledger = [];
+
+		foreach ( $accts as $a ) {
+			$opening = Ledger::account_balance( (int) $a->id, $prior );
+
+			$txns = $wpdb->get_results( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$wpdb->prepare(
+					"SELECT je.entry_date, je.id AS entry_id, je.memo, je.reference,
+					        jl.debit, jl.credit, jl.line_memo
+					   FROM {$lt} jl
+					   JOIN {$et} je ON je.id = jl.entry_id
+					  WHERE jl.account_id = %d AND je.posted = 1
+					    AND je.entry_date >= %s AND je.entry_date <= %s
+					  ORDER BY je.entry_date, je.id",
+					(int) $a->id, $start, $end
+				)
+			) ?: [];
+
+			if ( empty( $txns ) && bccomp( $opening, '0', 2 ) === 0 ) {
+				continue;
+			}
+
+			$is_debit_normal = in_array( $a->type, [ 'ASSET', 'EXPENSE' ], true );
+			$running         = $opening;
+			$rows            = [];
+
+			foreach ( $txns as $t ) {
+				$d        = number_format( (float) $t->debit,  2, '.', '' );
+				$c        = number_format( (float) $t->credit, 2, '.', '' );
+				$movement = $is_debit_normal ? bcsub( $d, $c, 2 ) : bcsub( $c, $d, 2 );
+				$running  = bcadd( $running, $movement, 2 );
+
+				$rows[] = [
+					'date'      => $t->entry_date,
+					'entry_id'  => (int) $t->entry_id,
+					'memo'      => $t->line_memo ?: ( $t->memo ?? '' ),
+					'reference' => $t->reference ?? '',
+					'debit'     => bccomp( $d, '0', 2 ) > 0 ? $d : '',
+					'credit'    => bccomp( $c, '0', 2 ) > 0 ? $c : '',
+					'balance'   => $running,
+				];
+			}
+
+			$ledger[] = [
+				'code'    => $a->code,
+				'name'    => $a->name,
+				'type'    => $a->type,
+				'opening' => $opening,
+				'rows'    => $rows,
+				'closing' => Ledger::account_balance( (int) $a->id, $end ),
+			];
+		}
+
+		return [
+			'period' => [ 'start' => $start, 'end' => $end ],
+			'ledger' => $ledger,
+		];
+	}
+
+	/**
 	 * Sum the 'amount' field of an array of labelled rows.
 	 *
 	 * @param array $rows Rows with 'amount' key.

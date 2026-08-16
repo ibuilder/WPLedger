@@ -6,7 +6,7 @@
  */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 ?>
-<div class="wrap lc-wrap">
+<div class="wrap wpl-wrap">
 	<h1><?php esc_html_e( 'Journal Ledger', 'wpledger' ); ?></h1>
 
 	<form method="get" style="margin-bottom:16px">
@@ -38,7 +38,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 		</p>
 
 		<?php foreach ( $entries as $entry ) : ?>
-			<table class="widefat lc-statement" style="margin-bottom:16px">
+			<table class="widefat wpl-statement" style="margin-bottom:16px">
 				<thead>
 					<tr class="wpl-section">
 						<th colspan="4">

@@ -29,7 +29,7 @@ define( 'WPLEDGER_URL', plugin_dir_url( __FILE__ ) );
  * @return void
  */
 function wpledger_missing_vendor_notice() {
-	echo '<div class="notice notice-error"><p><strong>WPLedger:</strong> '
+	echo '<div class="notice notice-error is-dismissible"><p><strong>WPLedger:</strong> '
 		. esc_html__( 'Composer dependencies are missing. Run "composer install" inside the plugin directory.', 'wpledger' )
 		. '</p></div>';
 }
