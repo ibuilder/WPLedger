@@ -1,5 +1,5 @@
 === WPLedger Accounting ===
-Contributors: wpledger
+Contributors: ibuilder
 Tags: accounting, bookkeeping, double-entry, financial statements, invoicing
 Requires at least: 6.0
 Tested up to: 6.8
