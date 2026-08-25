@@ -1,61 +1,92 @@
-﻿# Project: WPLedger — WordPress Accounting Plugin
+# WPLedger Accounting
 
-## What this is
-A WordPress plugin implementing a double-entry accounting system: companies,
-chart of accounts, journal entries, three financial statements (Balance Sheet,
-Income Statement, Cash Flow Statement), PDF export, and a REST API that accepts
-data from external invoicing and project-management tools.
+A WordPress plugin that brings full **double-entry accounting** to WordPress — chart of accounts, journal entries, financial statements, PDF export, WooCommerce integration, and a REST API.
 
-## Non-negotiable accounting invariants
-1. Every transaction is a journal entry with 2+ lines. Total debits MUST equal
-   total credits, and the total must be > 0. The engine refuses to save anything
-   that does not balance.
-2. Balances are NEVER stored. A balance is derived: SUM(debit) - SUM(credit)
-   (or the reverse) across journal lines, up to a date. Nothing is ever
-   overwritten; corrections are new entries.
-3. The accounting equation Assets = Liabilities + Equity must always hold. The
-   Balance Sheet exposes a `balanced` flag; if it is ever false, that is a bug.
-4. The Cash Flow Statement must reconcile: net change in cash from the statement
-   must equal the actual change in cash-flagged accounts. It exposes a
-   `reconciles` flag.
-5. All three statements read the SAME general ledger. They cannot disagree.
+## Features
 
-## Money handling — CRITICAL
-- All monetary DB columns are DECIMAL(18,2). NEVER use FLOAT or DOUBLE.
-- In PHP, NEVER do float arithmetic on money. Use bcmath (bcadd, bcsub, bccomp,
-  bcmul) with scale 2, treating amounts as strings.
-- MySQL DECIMAL aggregation (SUM) is exact, so summing in SQL is safe; combining
-  results in PHP uses bcmath.
+- **Double-entry ledger** — every transaction balances debits and credits; corrections are new entries, nothing is ever overwritten
+- **Chart of Accounts** — ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE with subtypes; active/inactive toggle
+- **Financial Statements** — Balance Sheet, Income Statement, Cash Flow Statement, Trial Balance, General Ledger; all with PDF download (Dompdf)
+- **Recurring Journal Entries** — templates that post automatically via WP-Cron (monthly, quarterly, annually) with idempotency protection
+- **WP Dashboard Widget** — monthly P&L snapshot (Revenue, Expenses, Net Income, Cash Balance)
+- **WooCommerce Integration** — automatically journals WC orders and refunds; customer PDF invoices on My Account
+- **REST API** — `wpledger/v1` namespace, authenticated with WordPress Application Passwords; endpoints for companies, journal entries, and reports
+- **QuickBooks CSV export** — IIF-style export for importing into external accounting software
+- **Multi-company** — manage separate books for multiple entities in one install
 
-## WordPress platform rules
-- Ledger data lives in CUSTOM TABLES via $wpdb, created with dbDelta() in the
-  activation hook. DO NOT use custom post types or postmeta for accounting data.
-- Every table name uses $wpdb->prefix. Plugin tables are prefixed `lc_`
-  (e.g. {$wpdb->prefix}lc_journal_entries).
-- ALL queries that take variables use $wpdb->prepare(). No exceptions.
-- REST routes are registered under namespace `wpledger/v1` via
-  register_rest_route, each with a permission_callback. Never leave a route open.
-- Admin pages require the `manage_wpledger` capability and verify nonces on
-  every write.
-- Sanitize all input (sanitize_text_field, absint, etc.); escape all output
-  (esc_html, esc_attr, esc_url, wp_kses_post).
-- Text domain is `wpledger`; wrap user-facing strings in __() / esc_html__().
+## Requirements
 
-## Code organization
-- PSR-4 autoloading via Composer under namespace `WPLedger\`.
-- Classes in includes/, one responsibility each. No business logic in the main
-  plugin file — it only bootstraps.
-- Dompdf is a Composer dependency for PDF rendering.
+- WordPress 6.0+
+- PHP 8.0+
+- MySQL 5.7+ / MariaDB 10.3+
+- Composer (for local development)
 
-## Coding standards
-- Follow WordPress PHP coding standards (WPCS). Run `composer run lint` if a
-  phpcs config exists.
-- Add a short PHPDoc block to every public method.
-- Prefer small, testable methods. The ledger and statements classes must be unit
-  tested.
+## Installation
 
-## How we work
-- Build in the phases described by the human. After each phase, STOP and report
-  what to test. Do not start the next phase until told.
-- Before writing the statements engine, the ledger engine must pass its tests.
-- When unsure about an accounting rule, ask rather than guess.
+### From wordpress.org (recommended)
+Search for **WPLedger Accounting** in *Plugins → Add New*.
+
+### Manual
+1. Download `wpledger-0.1.0.zip` from the [releases page](https://github.com/ibuilder/WPLedger/releases)
+2. Upload via *Plugins → Add New → Upload Plugin*
+3. Activate — tables are created automatically on activation
+
+### From source
+```bash
+git clone https://github.com/ibuilder/WPLedger.git
+cd WPLedger
+composer install
+```
+Copy or symlink the folder into `wp-content/plugins/`, then activate.
+
+## Building a submission zip
+
+```powershell
+.\build.ps1
+```
+
+Produces `wpledger-0.1.0.zip` — a clean, production-ready archive with dev files, hidden files, and unnecessary vendor stubs stripped out.
+
+## Database tables
+
+All tables use the WordPress table prefix + `wpl_`:
+
+| Table | Purpose |
+|---|---|
+| `wpl_companies` | Company/entity records |
+| `wpl_accounts` | Chart of accounts |
+| `wpl_journal_entries` | Journal entry headers |
+| `wpl_journal_lines` | Individual debit/credit lines |
+| `wpl_recurring_entries` | Recurring entry templates |
+
+Tables are created via `dbDelta()` on activation and dropped cleanly by `uninstall.php`.
+
+## Accounting invariants
+
+1. Every entry has ≥ 2 lines; total debits **must** equal total credits
+2. Balances are never stored — they are always derived from the ledger
+3. Assets = Liabilities + Equity (Balance Sheet `balanced` flag)
+4. Net cash change = change in cash-flagged accounts (Cash Flow `reconciles` flag)
+5. All monetary values are `DECIMAL(18,2)`; PHP arithmetic uses `bcmath`
+
+## Architecture
+
+```
+wpledger.php          — plugin header + bootstrap
+includes/
+  Admin/              — AdminMenu, DashboardWidget
+  Db/                 — Schema (dbDelta table creation)
+  Export/             — QuickBooksExporter
+  Integrations/       — WoocommerceSync, WcInvoice
+  Pdf/                — PdfRenderer (Dompdf wrapper)
+  Rest/               — RestCompanies, RestJournal, RestReports, RestIntegrations
+  Services/           — Ledger, Statements, Recurring
+assets/
+  css/admin.css
+  js/admin.js
+vendor/               — Composer dependencies (Dompdf, Masterminds HTML5, etc.)
+```
+
+## License
+
+GPL-2.0-or-later — see [LICENSE](LICENSE)
